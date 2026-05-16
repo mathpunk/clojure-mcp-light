@@ -63,7 +63,7 @@
   [s]
   (try
     (let [repaired (parinferish/flatten
-                    (parinferish/parse s {:mode :indent}))]
+                    (parinferish/parse s {:mode :smart}))]
       {:success true
        :text repaired
        :error nil})
@@ -90,7 +90,7 @@
    - :error - error message (if unsuccessful)"
   [s]
   (let [result (shell/sh "parinfer-rust"
-                         "--mode" "indent"
+                         "--mode" "smart"
                          "--language" "clojure"
                          "--output-format" "json"
                          :in s)
