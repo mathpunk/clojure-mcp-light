@@ -390,10 +390,14 @@
 
 (defn get-code
   "Get code from command-line arguments or stdin.
-  Arguments take precedence over stdin.
+  Arguments take precedence over stdin. A lone \"-\" argument means read
+  stdin (the usual CLI convention) rather than evaluating the symbol `-`,
+  which silently \"succeeds\" with #function[clojure.core/-].
   Returns nil if no code is available from either source."
   [arguments]
   (cond
+    (= "-" (first arguments)) (let [code (slurp *in*)]
+                                (when-not (str/blank? code) code))
     (seq arguments) (first arguments)
     (has-stdin-data?) (slurp *in*)
     :else nil))
@@ -422,6 +426,7 @@
              "  Prefer heredoc via stdin (<<'EOF' ... EOF) to avoid shell escaping issues."
              "  Code can also be provided as a command-line argument."
              "  Arguments take precedence over stdin when both are provided."
+             "  A lone - as the code argument reads stdin."
              ""
              "Workflow:"
              "  1. Use --discover-ports to find nREPL servers in current directory"

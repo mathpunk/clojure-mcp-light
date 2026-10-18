@@ -127,3 +127,13 @@
       (is (map? result))
       (is (= "done" (first (:status result))))
       (is (= "42" (:value result))))))
+
+(deftest get-code-dash-reads-stdin-test
+  (testing "'-' as the code argument means read stdin, not eval the symbol -"
+    (binding [*in* (java.io.BufferedReader. (java.io.StringReader. "(+ 1 2)"))]
+      (is (= "(+ 1 2)" (ne/get-code ["-"])))))
+  (testing "'-' with empty stdin yields no code, so the caller errors loudly"
+    (binding [*in* (java.io.BufferedReader. (java.io.StringReader. ""))]
+      (is (nil? (ne/get-code ["-"])))))
+  (testing "an ordinary code argument still wins"
+    (is (= "(inc 1)" (ne/get-code ["(inc 1)"])))))
